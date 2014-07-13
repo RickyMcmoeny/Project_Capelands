@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <cmath>
 
 #include <iostream>
 using namespace std;
@@ -26,7 +27,7 @@ float angleX = 0.0f; //for left-right
 float angleY = 0.0f; //for up-down
 
 // actual vector representing the camera's direction
-float lx=0.0f,lz=-1.0f, ly = 0.0f, lsx = 0.0f, lsz = 0.0f;
+float lx=0.0f,lz=-1.0f, ly = 0.0f, ly2 = 0.0f, lsx = 0.0f, lsz = 0.0f;
 
 // XZ position of the camera
 float x=0.0f, z=5.0f, y = 1.75f;
@@ -36,7 +37,8 @@ float x=0.0f, z=5.0f, y = 1.75f;
 float deltaAngleX = 0.0f;
 float deltaAngleY = 0.0f;
 float deltaMoveX = 0; //forward/backwards
-float deltaMoveS = 0; //strafe
+float deltaMoveS = 0; //strafe side to side
+float deltaMoveY = 0; // up and down
 
 float mouseSensitivity = 0.005f; //what camera movements are multiplied by. Default = 0.001f
 
@@ -168,14 +170,21 @@ void setOrthographicProjection() {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void computePos(float deltaMoveX, float deltaMoveS) {
+void computePos(float deltaMoveX, float deltaMoveS, float deltaMoveY) {
     
 	x += deltaMoveX * lx * 0.1f;
 	z += deltaMoveX * lz * 0.1f;
     
     x += deltaMoveS * lsx * 0.1f;
     z += deltaMoveS * lsz * 0.1f;
+    
+    y += deltaMoveY * 0.1f;
         //add strafe move here
+    
+    if (abs(deltaMoveY) > 0)
+    {
+      //  cout << deltaMoveY << "\n";
+    }
 }
 
 // Common Render Items for all subwindows
@@ -254,7 +263,21 @@ void renderSceneAll() {
     
 	// check for keyboard movement
 	//if (deltaMoveX || deltaMoveS) {
-    computePos(deltaMoveX,deltaMoveS);
+    cout << "Y: " << y << "\n";
+    if(abs(y) > 1)
+    {
+        if(y > 1)
+        {
+            deltaMoveY = deltaMoveY - 0.05;
+        }
+        
+        else if (y < 1)
+        {
+            deltaMoveY += 0.05;
+        }
+        
+    }
+    computePos(deltaMoveX,deltaMoveS,deltaMoveY);
     glutSetWindow(mainWindow);
      //glutSetCursor(GLUT_CURSOR_NONE);
     glutPostRedisplay();
@@ -271,9 +294,9 @@ void renderSceneAll() {
 void processNormalKeys(unsigned char key, int xx, int yy) {
     
     //cout<<key;
-    //printf("key %d\n", key);
-    printf("angle %f\n", angleX);
-    printf("angle %f\n", deltaAngleX);
+    printf("key %d\n", key);
+    //printf("angle %f\n", angleX);
+    //printf("angle %f\n", deltaAngleX);
 
 
     switch (key) {
@@ -281,6 +304,7 @@ void processNormalKeys(unsigned char key, int xx, int yy) {
         case 115: deltaMoveX = -0.5f; break;
         case 100: deltaMoveS = 0.5f; break;
         case 97: deltaMoveS = -0.5; break;
+        case 32: deltaMoveY += 2; break; //space bar for jump
         case 27 : glutDestroyWindow(mainWindow); exit(0);
     }
     
@@ -326,79 +350,120 @@ void releaseKey(int key, int x, int y) {
 
 int Xprogress = 0;
 int Yprogress = 0;
-
-int stableX = 0;
-int stableY = 0;
+float lysave = 0;
 
 void mouseMove(int x, int y) {
     
     glutSetWindow(mainWindow);
     
-    stableX = x;
-    stableY = y;
-
-    
     if( x <= 10 || (y) <= 10 || x >= w-10 || y >= h-10) {
-        
         
         Xprogress += x - w/2;//+ (x - xOrigin + Xprogress);
         Yprogress += y - h/2;//+ (y - yOrigin + Yprogress);
         
-        
         glutWarpPointer( w/2, h/2 ); // TODO: REPLACE THIS METHOD, IT CAUSES CHOPPY MOUSE MOVEMENT
-        
-        //NOTE: the x and y values of the game and the x/y values of the origin are not on the same window
-
-        // Have to re-hide if the user touched any UI element with the invisible pointer, like the Dock.
-        //CGDisplayHideCursor(kCGDirectMainDisplay);
-        
-        //	If on Mac OS X, the following will also work (and CGwarpMouseCursorPosition seems faster than glutWarpPointer).
-        //	CGPoint centerPos = CGPointMake( windowX + lastX, windowY + lastY );
-        //	CGWarpMouseCursorPosition( centerPos );
-        // Have to re-hide if the user touched any UI element with the invisible pointer, like the Dock.
-        //	CGDisplayHideCursor(kCGDirectMainDisplay);
     }
     
     else
     {
         
-
-        // cout << deltaAngleX << "\n";
-        // cout << deltaAngleY << "\n";
-        
-        
-        
-        deltaAngleY = (y + Yprogress - yOrigin) * mouseSensitivity;
+        deltaAngleY = (y + Yprogress - yOrigin) * mouseSensitivity*2;
         deltaAngleX = (x  + Xprogress - xOrigin) * mouseSensitivity;
         
         // update camera's direction
         lx = sin(angleX + deltaAngleX);
         lz = -cos(angleX + deltaAngleX);
         ly = -sin(angleY + deltaAngleY);
+        cout << "ly:" << ly << "\n";
+        cout << "angledelta: " << (angleY + deltaAngleY) << "\n";
+        
+        float xyz = -(angleY + deltaAngleY);
+        if (xyz >= 1.5707 && xyz < 3.1414) {
+            
+            lysave = 1 - cos(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        else if(xyz >= 3.1414 && xyz < 4.7121)
+        {
+            lysave = 2 + sin(angleY + deltaAngleY);
+            ly = lysave;
+            
+            
+        }
+        else if(xyz >= 4.7121 && xyz < 6.2828)
+        {
+            lysave = 3 + cos(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        
+        else if(xyz >= 6.2828)
+        {
+            ly = 4;
+        }
+        else if (xyz >= 0 && xyz < 1.5707)
+        {
+            lysave = -sin(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        else if (xyz <= 0 && xyz > -1.5707)
+        {
+            cout << "ping" << "\n";
+            lysave = -1 + cos(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        else if (xyz <= -1.5707 && xyz > -3.1414)
+        {
+            lysave = -2 + sin(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        
+        else if (xyz <= -3.1414 && xyz > -4.7121)
+        {
+            lysave = -3 - cos(angleY + deltaAngleY);
+            ly = lysave;
+        }
+        
+        else if (xyz <= -4.7121 && xyz > -6.2828)
+        {
+            ly = -4;
+        }
+        
+        else if (xyz < -6.2828)
+        {
+            ly = -4;
+        }
+        
+
+            
+
+        cout << "angleY:" << angleY << "\n";
+        cout << "lysave:" << lysave << "\n";
+        cout << "final ly: " << ly << "\n";
+
         lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
         lsz = -cos(angleX + deltaAngleX + 1.5707);
         
-        cout << "x:" << x << "\n";
-        cout << "y:" << y << "\n";
-        cout << "xOrigin:" << xOrigin << "\n";
-        cout << "yOrigin:" << yOrigin << "\n";
-        cout << "xProgress" << Xprogress << "\n";
-        cout << "yProgress" << Yprogress << "\n";
-        cout << "deltaAngleY:" << deltaAngleY << "\n";
-        cout << "deltaAngleX:" << deltaAngleX << "\n";
-        cout << "angleX:" << angleX << "\n";
-        cout << "angleY:" << angleY << "\n";
-
+        if (1 == 0) // set to one = one for debug info
+        {
+            cout << "x:" << x << "\n";
+            cout << "y:" << y << "\n";
+            cout << "xOrigin:" << xOrigin << "\n";
+            cout << "yOrigin:" << yOrigin << "\n";
+            cout << "xProgress" << Xprogress << "\n";
+            cout << "yProgress" << Yprogress << "\n";
+            cout << "deltaAngleY:" << deltaAngleY << "\n";
+            cout << "deltaAngleX:" << deltaAngleX << "\n";
+            cout << "angleX:" << angleX << "\n";
+            cout << "angleY:" << angleY << "\n";
+        }
         
         angleX += deltaAngleX;
-        angleY += deltaAngleY;
-    
-        
-        
+        if(abs(angleY + deltaAngleY) <= 6.5)
+        {
+            angleY += deltaAngleY;
+        }
         xOrigin = x + Xprogress;//+ Xprogress;
         yOrigin = y + Yprogress;//+ Yprogress;
-        
-        
         
     }
         
@@ -481,7 +546,7 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(600,600);
+	glutInitWindowSize(1000,1000);
 	mainWindow = glutCreateWindow("Capelands Alpha 0.02");
     
     
