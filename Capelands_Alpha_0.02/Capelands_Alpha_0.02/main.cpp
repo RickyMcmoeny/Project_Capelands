@@ -38,8 +38,7 @@ float deltaAngleY = 0.0f;
 float deltaMoveX = 0; //forward/backwards
 float deltaMoveS = 0; //strafe
 
-
-float mouseSensitivity = 0.01f; //what camera movements are multiplied by. Default = 0.001f
+float mouseSensitivity = 0.005f; //what camera movements are multiplied by. Default = 0.001f
 
 int xOrigin = -1;
 int yOrigin = -1;
@@ -88,22 +87,18 @@ void changeSize(int w1,int h1) {
 	glutSetWindow(subWindow1);
 	// resize and reposition the sub window
 	glutPositionWindow(border,border);
-	glutReshapeWindow(w-2*border, h/2 - border*3/2);
-	setProjection(w-2*border, h/2 - border*3/2);
+    glutReshapeWindow(w, h);
+    setProjection(w, h);
+	//glutReshapeWindow(w-2*border, h/2 - border*3/2);
+	//setProjection(w-2*border, h/2 - border*3/2);
     
 	// set subwindow 2 as the active window
-	glutSetWindow(subWindow2);
+	//glutSetWindow(subWindow2);
 	// resize and reposition the sub window
-	glutPositionWindow(border,(h+border)/2);
-	glutReshapeWindow(w/2-border*3/2, h/2 - border*3/2);
-	setProjection(w/2-border*3/2,h/2 - border*3/2);
-    
-	// set subwindow 3 as the active window
-	glutSetWindow(subWindow3);
-	// resize and reposition the sub window
-	glutPositionWindow((w+border)/2,(h+border)/2);
-	glutReshapeWindow(w/2-border*3/2,h/2 - border*3/2);
-	setProjection(w/2-border*3/2,h/2 - border*3/2);
+	//glutPositionWindow(border,(h+border)/2);
+	//glutReshapeWindow(w/2-border*3/2, h/2 - border*3/2);
+	//setProjection(w/2-border*3/2,h/2 - border*3/2);
+
 }
 
 void drawTower() {
@@ -218,7 +213,7 @@ void renderScene() {
 void renderScenesw1() {
     
 	glutSetWindow(subWindow1);
-     glutSetCursor(GLUT_CURSOR_NONE);
+     //glutSetCursor(GLUT_CURSOR_NONE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	glLoadIdentity();
@@ -251,55 +246,8 @@ void renderScenesw1() {
 	glutSwapBuffers();
 }
 
-// Display func for sub window 2
-void renderScenesw2() {
-    
-	glutSetWindow(subWindow2);
-     glutSetCursor(GLUT_CURSOR_NONE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-	glLoadIdentity();
-	gluLookAt(x, y+15, z,
-              x ,y - 1,z,
-              lx,0,lz);
-    
-	// Draw red cone at the location of the main camera
-	glPushMatrix();
-	glColor3f(1.0,0.0,0.0);
-	glTranslatef(x,y,z);
-	glRotatef(180-(angleX+deltaAngleX)*180.0/3.14,0.0,1.0,0.0);
-	glutSolidCone(0.2,0.8f,4,4);
-	glPopMatrix();
-    
-	renderScene2();
-    
-	glutSwapBuffers();
-}
 
-// Display func for sub window 3
-void renderScenesw3() {
-    
-	glutSetWindow(subWindow3);
-     glutSetCursor(GLUT_CURSOR_NONE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-	glLoadIdentity();
-	gluLookAt(x-lz*10 , y, z+lx*10,
-              x ,y ,z ,
-              0.0f,1.0f,0.0f);
-    
-	// Draw red cone at the location of the main camera
-	glPushMatrix();
-	glColor3f(1.0,0.0,0.0);
-	glTranslatef(x,y,z);
-	glRotatef(180-(angleX+deltaAngleX)*180.0/3.14,0.0,1.0,0.0);
-	glutSolidCone(0.2,0.8f,4,4);
-	glPopMatrix();
-    
-	renderScene2();
-    
-	glutSwapBuffers();
-}
+
 
 // Global render func
 void renderSceneAll() {
@@ -308,14 +256,12 @@ void renderSceneAll() {
 	//if (deltaMoveX || deltaMoveS) {
     computePos(deltaMoveX,deltaMoveS);
     glutSetWindow(mainWindow);
-     glutSetCursor(GLUT_CURSOR_NONE);
+     //glutSetCursor(GLUT_CURSOR_NONE);
     glutPostRedisplay();
 	//}
     
 	renderScene();
 	renderScenesw1();
-	renderScenesw2();
-	renderScenesw3();
 }
 
 // -----------------------------------
@@ -378,45 +324,25 @@ void releaseKey(int key, int x, int y) {
 
 
 
+int Xprogress = 0;
+int Yprogress = 0;
+
+int stableX = 0;
+int stableY = 0;
+
 void mouseMove(int x, int y) {
     
     glutSetWindow(mainWindow);
+    
+    stableX = x;
+    stableY = y;
 
     
-    deltaAngleX = (x - xOrigin);
-    deltaAngleY = (y - yOrigin);
-    
-    int Xprogress = 0;
-    int Yprogress = 0;
-    
-   // cout << deltaAngleX << "\n";
-   // cout << deltaAngleY << "\n";
-    
-
-    
-    
-    
-    deltaAngleY = (y - yOrigin + Yprogress) * mouseSensitivity;
-    deltaAngleX = (x - xOrigin + Xprogress) * mouseSensitivity;
-
-    // update camera's direction
-    lx = sin(angleX + deltaAngleX);
-    lz = -cos(angleX + deltaAngleX);
-    ly = -sin(angleY + deltaAngleY);
-    lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
-    lsz = -cos(angleX + deltaAngleX + 1.5707);
-    cout << "x:" << x << "\n";
-    cout << "y:" << y << "\n";
-    cout << "deltaAngleY:" << deltaAngleY << "\n";
-    cout << "deltaAngleX:" << deltaAngleX << "\n";
-    cout << "xOrigin:" << xOrigin << "\n";
-    cout << "yOrigin:" << yOrigin << "\n";
-
-    
-    if( x <= -w/2 || (y) <= -h/2 || x >= w/2 || y >= h/2) {
+    if( x <= 10 || (y) <= 10 || x >= w-10 || y >= h-10) {
         
-        Xprogress += x + (x - xOrigin + Xprogress);
-        Yprogress += y + (y - yOrigin + Yprogress);
+        
+        Xprogress += x - w/2;//+ (x - xOrigin + Xprogress);
+        Yprogress += y - h/2;//+ (y - yOrigin + Yprogress);
         
         
         glutWarpPointer( w/2, h/2 ); // TODO: REPLACE THIS METHOD, IT CAUSES CHOPPY MOUSE MOVEMENT
@@ -432,12 +358,51 @@ void mouseMove(int x, int y) {
         // Have to re-hide if the user touched any UI element with the invisible pointer, like the Dock.
         //	CGDisplayHideCursor(kCGDirectMainDisplay);
     }
-        
-    angleX += deltaAngleX;
-    angleY += deltaAngleY;
     
-    xOrigin = x - Xprogress;
-    yOrigin = y - Yprogress;
+    else
+    {
+        
+
+        // cout << deltaAngleX << "\n";
+        // cout << deltaAngleY << "\n";
+        
+        
+        
+        deltaAngleY = (y + Yprogress - yOrigin) * mouseSensitivity;
+        deltaAngleX = (x  + Xprogress - xOrigin) * mouseSensitivity;
+        
+        // update camera's direction
+        lx = sin(angleX + deltaAngleX);
+        lz = -cos(angleX + deltaAngleX);
+        ly = -sin(angleY + deltaAngleY);
+        lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
+        lsz = -cos(angleX + deltaAngleX + 1.5707);
+        
+        cout << "x:" << x << "\n";
+        cout << "y:" << y << "\n";
+        cout << "xOrigin:" << xOrigin << "\n";
+        cout << "yOrigin:" << yOrigin << "\n";
+        cout << "xProgress" << Xprogress << "\n";
+        cout << "yProgress" << Yprogress << "\n";
+        cout << "deltaAngleY:" << deltaAngleY << "\n";
+        cout << "deltaAngleX:" << deltaAngleX << "\n";
+        cout << "angleX:" << angleX << "\n";
+        cout << "angleY:" << angleY << "\n";
+
+        
+        angleX += deltaAngleX;
+        angleY += deltaAngleY;
+    
+        
+        
+        xOrigin = x + Xprogress;//+ Xprogress;
+        yOrigin = y + Yprogress;//+ Yprogress;
+        
+        
+        
+    }
+        
+
     
     //deltaAngleX = 0.0f;
     //deltaAngleY = 0.0f;
@@ -516,7 +481,7 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(1200,1000);
+	glutInitWindowSize(600,600);
 	mainWindow = glutCreateWindow("Capelands Alpha 0.02");
     
     
@@ -529,18 +494,10 @@ int main(int argc, char **argv) {
 	init();
     
 	// sub windows
-	subWindow1 = glutCreateSubWindow(mainWindow, border,border,w-2*border, h/2 - border*3/2);
+	subWindow1 = glutCreateSubWindow(mainWindow, border,border,border, border);
 	glutDisplayFunc(renderScenesw1);
 	init();
-    
-	subWindow2 = glutCreateSubWindow(mainWindow, border,(h+border)/2,w/2-border*3/2, h/2 - border*3/2);
-	glutDisplayFunc(renderScenesw2);
-	init();
-    
-	subWindow3 = glutCreateSubWindow(mainWindow, (w+border)/2,(h+border)/2,w/2-border*3/2,h/2 - border*3/2);
-	glutDisplayFunc(renderScenesw3);
-	init();
-    
+
 	// enter GLUT event processing cycle
 	glutMainLoop();
 	
