@@ -37,6 +37,9 @@ float deltaAngleX = 0.0f;
 float deltaAngleY = 0.0f;
 float deltaMoveX = 0; //forward/backwards
 float deltaMoveS = 0; //strafe
+
+float mouseSensitivity = 0.002f; //what camera movements are multiplied by. Default = 0.001f
+
 int xOrigin = -1;
 int yOrigin = -1;
 
@@ -375,20 +378,20 @@ void mouseMove(int x, int y) {
     
     if (yOrigin >= 0) {
         //get looking up and down
+        deltaAngleY = (y - yOrigin) * mouseSensitivity;
         
+        ly = -sin(angleY + deltaAngleY);
     }
     
 	// this will only be true when the left button is down
 	if (xOrigin >= 0) {
         
 		// update deltaAngleX
-		deltaAngleX = (x - xOrigin) * 0.001f;
+		deltaAngleX = (x - xOrigin) * mouseSensitivity;
         
 		// update camera's direction
 		lx = sin(angleX + deltaAngleX);
 		lz = -cos(angleX + deltaAngleX);
-        
-        
         
         lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
         lsz = -cos(angleX + deltaAngleX + 1.5707);
@@ -413,6 +416,7 @@ void mouseButton(int button, int state, int x, int y) {
 		}
 		else  {// state = GLUT_DOWN
 			xOrigin = x;
+            yOrigin = y;
             
 		}
 	}
