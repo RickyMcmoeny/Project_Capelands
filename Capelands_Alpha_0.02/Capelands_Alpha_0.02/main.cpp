@@ -38,7 +38,8 @@ float deltaAngleY = 0.0f;
 float deltaMoveX = 0; //forward/backwards
 float deltaMoveS = 0; //strafe
 
-float mouseSensitivity = 0.002f; //what camera movements are multiplied by. Default = 0.001f
+
+float mouseSensitivity = 0.01f; //what camera movements are multiplied by. Default = 0.001f
 
 int xOrigin = -1;
 int yOrigin = -1;
@@ -217,7 +218,7 @@ void renderScene() {
 void renderScenesw1() {
     
 	glutSetWindow(subWindow1);
-    
+     glutSetCursor(GLUT_CURSOR_NONE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	glLoadIdentity();
@@ -254,7 +255,7 @@ void renderScenesw1() {
 void renderScenesw2() {
     
 	glutSetWindow(subWindow2);
-    
+     glutSetCursor(GLUT_CURSOR_NONE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	glLoadIdentity();
@@ -279,7 +280,7 @@ void renderScenesw2() {
 void renderScenesw3() {
     
 	glutSetWindow(subWindow3);
-    
+     glutSetCursor(GLUT_CURSOR_NONE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	glLoadIdentity();
@@ -304,11 +305,12 @@ void renderScenesw3() {
 void renderSceneAll() {
     
 	// check for keyboard movement
-	if (deltaMoveX || deltaMoveS) {
-		computePos(deltaMoveX,deltaMoveS);
-		glutSetWindow(mainWindow);
-		glutPostRedisplay();
-	}
+	//if (deltaMoveX || deltaMoveS) {
+    computePos(deltaMoveX,deltaMoveS);
+    glutSetWindow(mainWindow);
+     glutSetCursor(GLUT_CURSOR_NONE);
+    glutPostRedisplay();
+	//}
     
 	renderScene();
 	renderScenesw1();
@@ -374,32 +376,99 @@ void releaseKey(int key, int x, int y) {
 //             MOUSE
 // -----------------------------------
 
+
+
 void mouseMove(int x, int y) {
     
-    if (yOrigin >= 0) {
-        //get looking up and down
-        deltaAngleY = (y - yOrigin) * mouseSensitivity;
+    glutSetWindow(mainWindow);
+
+    
+    deltaAngleX = (x - xOrigin);
+    deltaAngleY = (y - yOrigin);
+    
+    int Xprogress = 0;
+    int Yprogress = 0;
+    
+   // cout << deltaAngleX << "\n";
+   // cout << deltaAngleY << "\n";
+    
+
+    
+    
+    
+    deltaAngleY = (y - yOrigin + Yprogress) * mouseSensitivity;
+    deltaAngleX = (x - xOrigin + Xprogress) * mouseSensitivity;
+
+    // update camera's direction
+    lx = sin(angleX + deltaAngleX);
+    lz = -cos(angleX + deltaAngleX);
+    ly = -sin(angleY + deltaAngleY);
+    lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
+    lsz = -cos(angleX + deltaAngleX + 1.5707);
+    cout << "x:" << x << "\n";
+    cout << "y:" << y << "\n";
+    cout << "deltaAngleY:" << deltaAngleY << "\n";
+    cout << "deltaAngleX:" << deltaAngleX << "\n";
+    cout << "xOrigin:" << xOrigin << "\n";
+    cout << "yOrigin:" << yOrigin << "\n";
+
+    
+    if( x <= -w/2 || (y) <= -h/2 || x >= w/2 || y >= h/2) {
         
-        ly = -sin(angleY + deltaAngleY);
+        Xprogress += x + (x - xOrigin + Xprogress);
+        Yprogress += y + (y - yOrigin + Yprogress);
+        
+        
+        glutWarpPointer( w/2, h/2 ); // TODO: REPLACE THIS METHOD, IT CAUSES CHOPPY MOUSE MOVEMENT
+        
+        //NOTE: the x and y values of the game and the x/y values of the origin are not on the same window
+
+        // Have to re-hide if the user touched any UI element with the invisible pointer, like the Dock.
+        //CGDisplayHideCursor(kCGDirectMainDisplay);
+        
+        //	If on Mac OS X, the following will also work (and CGwarpMouseCursorPosition seems faster than glutWarpPointer).
+        //	CGPoint centerPos = CGPointMake( windowX + lastX, windowY + lastY );
+        //	CGWarpMouseCursorPosition( centerPos );
+        // Have to re-hide if the user touched any UI element with the invisible pointer, like the Dock.
+        //	CGDisplayHideCursor(kCGDirectMainDisplay);
     }
+        
+    angleX += deltaAngleX;
+    angleY += deltaAngleY;
+    
+    xOrigin = x - Xprogress;
+    yOrigin = y - Yprogress;
+    
+    //deltaAngleX = 0.0f;
+    //deltaAngleY = 0.0f;
+    
+    
+        
+    //}
+    
+//    if (yOrigin >= 0) {
+        //get looking up and down
+//        deltaAngleY = (y - yOrigin) * mouseSensitivity;
+        
+//        ly = -sin(angleY + deltaAngleY);
+//    }
     
 	// this will only be true when the left button is down
-	if (xOrigin >= 0) {
+//	if (xOrigin >= 0) {
         
 		// update deltaAngleX
-		deltaAngleX = (x - xOrigin) * mouseSensitivity;
+//		deltaAngleX = (x - xOrigin) * mouseSensitivity;
         
 		// update camera's direction
-		lx = sin(angleX + deltaAngleX);
-		lz = -cos(angleX + deltaAngleX);
+//		lx = sin(angleX + deltaAngleX);
+	//	lz = -cos(angleX + deltaAngleX);
+  
+//        lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
+//        lsz = -cos(angleX + deltaAngleX + 1.5707);
         
-        lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
-        lsz = -cos(angleX + deltaAngleX + 1.5707);
         
-        
-		glutSetWindow(mainWindow);
-		glutPostRedisplay();
-	}
+
+//	}
 }
 
 void mouseButton(int button, int state, int x, int y) {
@@ -412,11 +481,8 @@ void mouseButton(int button, int state, int x, int y) {
         {
 			angleX += deltaAngleX;
 			deltaAngleX = 0.0f;
-			xOrigin = -1;
 		}
 		else  {// state = GLUT_DOWN
-			xOrigin = x;
-            yOrigin = y;
             
 		}
 	}
@@ -425,6 +491,9 @@ void mouseButton(int button, int state, int x, int y) {
 // -----------------------------------
 //             MAIN and INIT
 // -----------------------------------
+
+
+
 
 void init() {
     
@@ -438,7 +507,7 @@ void init() {
 	glutSpecialFunc(pressKey);
 	glutSpecialUpFunc(releaseKey);
 	glutMouseFunc(mouseButton);
-	glutMotionFunc(mouseMove);
+    glutPassiveMotionFunc(mouseMove);
 }
 
 int main(int argc, char **argv) {
@@ -447,8 +516,9 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(800,800);
+	glutInitWindowSize(1200,1000);
 	mainWindow = glutCreateWindow("Capelands Alpha 0.02");
+    
     
 	// callbacks for main window
 	glutDisplayFunc(renderSceneAll);

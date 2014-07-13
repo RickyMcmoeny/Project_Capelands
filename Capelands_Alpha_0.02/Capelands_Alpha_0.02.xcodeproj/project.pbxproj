@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16211A841972545C00F74EA4 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16211A831972545C00F74EA4 /* GLKit.framework */; };
+		16211A86197254A200F74EA4 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16211A85197254A200F74EA4 /* AppKit.framework */; };
+		16211A891972569900F74EA4 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16211A871972569900F74EA4 /* Quartz.framework */; };
+		16211A8A1972569900F74EA4 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16211A881972569900F74EA4 /* QuartzCore.framework */; };
 		16CE72E01971DD070061C378 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16CE72DF1971DD070061C378 /* GLUT.framework */; };
 		16CE72E21971DD110061C378 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16CE72E11971DD110061C378 /* OpenGL.framework */; };
 		16E55F321971DCA1005AF2B9 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16E55F311971DCA1005AF2B9 /* main.cpp */; };
@@ -25,6 +29,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		16211A831972545C00F74EA4 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		16211A85197254A200F74EA4 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		16211A871972569900F74EA4 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		16211A881972569900F74EA4 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		16CE72DF1971DD070061C378 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		16CE72E11971DD110061C378 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		16E55F2E1971DCA1005AF2B9 /* Capelands_Alpha_0.02 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Capelands_Alpha_0.02; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -36,6 +44,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16211A891972569900F74EA4 /* Quartz.framework in Frameworks */,
+				16211A8A1972569900F74EA4 /* QuartzCore.framework in Frameworks */,
+				16211A86197254A200F74EA4 /* AppKit.framework in Frameworks */,
+				16211A841972545C00F74EA4 /* GLKit.framework in Frameworks */,
 				16CE72E21971DD110061C378 /* OpenGL.framework in Frameworks */,
 				16CE72E01971DD070061C378 /* GLUT.framework in Frameworks */,
 			);
@@ -47,6 +59,10 @@
 		16E55F251971DCA1005AF2B9 = {
 			isa = PBXGroup;
 			children = (
+				16211A871972569900F74EA4 /* Quartz.framework */,
+				16211A881972569900F74EA4 /* QuartzCore.framework */,
+				16211A85197254A200F74EA4 /* AppKit.framework */,
+				16211A831972545C00F74EA4 /* GLKit.framework */,
 				16CE72E11971DD110061C378 /* OpenGL.framework */,
 				16CE72DF1971DD070061C378 /* GLUT.framework */,
 				16E55F301971DCA1005AF2B9 /* Capelands_Alpha_0.02 */,
