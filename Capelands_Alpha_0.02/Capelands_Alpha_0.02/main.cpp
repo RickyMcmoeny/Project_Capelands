@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+
+#include <iostream>
+using namespace std;
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -22,7 +26,7 @@ float angleX = 0.0f; //for left-right
 float angleY = 0.0f; //for up-down
 
 // actual vector representing the camera's direction
-float lx=0.0f,lz=-1.0f, ly = 0.0f;
+float lx=0.0f,lz=-1.0f, ly = 0.0f, lsx = 0.0f, lsz = 0.0f;
 
 // XZ position of the camera
 float x=0.0f, z=5.0f, y = 1.75f;
@@ -31,8 +35,8 @@ float x=0.0f, z=5.0f, y = 1.75f;
 //when no key is being presses
 float deltaAngleX = 0.0f;
 float deltaAngleY = 0.0f;
-float deltaMoveX = 0;
-float deltaMoveY = 0;
+float deltaMoveX = 0; //forward/backwards
+float deltaMoveS = 0; //strafe
 int xOrigin = -1;
 int yOrigin = -1;
 
@@ -41,7 +45,7 @@ int h,w;
 
 // variables to compute frames per second
 int frame;
-long time, timebase;
+long newtime, timebase;
 char s[50];
 
 // variables to hold window identifiers
@@ -165,10 +169,14 @@ void setOrthographicProjection() {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void computePos(float deltaMoveX) {
+void computePos(float deltaMoveX, float deltaMoveS) {
     
 	x += deltaMoveX * lx * 0.1f;
 	z += deltaMoveX * lz * 0.1f;
+    
+    x += deltaMoveS * lsx * 0.1f;
+    z += deltaMoveS * lsz * 0.1f;
+        //add strafe move here
 }
 
 // Common Render Items for all subwindows
@@ -184,7 +192,7 @@ void renderScene2() {
     glVertex3f( 100.0f, 0.0f, -100.0f);
 	glEnd();
     
-    // Draw 36 SnowMen
+    // Draw 36 Towers
 	for(int i = -3; i < 3; i++)
 		for(int j=-3; j < 3; j++)
 		{
@@ -219,11 +227,11 @@ void renderScenesw1() {
 	// display fps in the top window
  	frame++;
     
-	time=glutGet(GLUT_ELAPSED_TIME);
-	if (time - timebase > 1000) {
-		sprintf(s,"Lighthouse3D - FPS:%4.2f",
-                frame*1000.0/(time-timebase));
-		timebase = time;
+	newtime=glutGet(GLUT_ELAPSED_TIME);
+	if (newtime - timebase > 1000) {
+		sprintf(s,"Capelands - FPS:%4.2f",
+                frame*1000.0/(newtime-timebase));
+		timebase = newtime;
 		frame = 0;
 	}
     
@@ -293,8 +301,8 @@ void renderScenesw3() {
 void renderSceneAll() {
     
 	// check for keyboard movement
-	if (deltaMoveX) {
-		computePos(deltaMoveX);
+	if (deltaMoveX || deltaMoveS) {
+		computePos(deltaMoveX,deltaMoveS);
 		glutSetWindow(mainWindow);
 		glutPostRedisplay();
 	}
@@ -311,10 +319,23 @@ void renderSceneAll() {
 
 void processNormalKeys(unsigned char key, int xx, int yy) {
     
-	if (key == 27) {
-		glutDestroyWindow(mainWindow);
-		exit(0);
-	}
+    //cout<<key;
+    //printf("key %d\n", key);
+    printf("angle %f\n", angleX);
+    printf("angle %f\n", deltaAngleX);
+
+
+    switch (key) {
+        case 119: deltaMoveX = 0.5f; break;
+        case 115: deltaMoveX = -0.5f; break;
+        case 100: deltaMoveS = 0.5f; break;
+        case 97: deltaMoveS = -0.5; break;
+        case 27 : glutDestroyWindow(mainWindow); exit(0);
+    }
+    
+    glutSetWindow(mainWindow);
+    glutPostRedisplay();
+    
 }
 
 void pressKey(int key, int xx, int yy) {
@@ -322,7 +343,12 @@ void pressKey(int key, int xx, int yy) {
 	switch (key) {
 		case GLUT_KEY_UP : deltaMoveX = 0.5f; break;
 		case GLUT_KEY_DOWN : deltaMoveX = -0.5f; break;
+        case 119: deltaMoveX = 0.5f; break;
+        case 115: deltaMoveX = -0.5f; break;
+        case 100: deltaMoveS = 0.5f; break;
+        case 97: deltaMoveS = -0.5; break;
 	}
+    
 	glutSetWindow(mainWindow);
 	glutPostRedisplay();
     
@@ -332,7 +358,12 @@ void releaseKey(int key, int x, int y) {
     
 	switch (key) {
 		case GLUT_KEY_UP :
-		case GLUT_KEY_DOWN : deltaMoveX = 0;break;
+		case GLUT_KEY_DOWN :
+        case 119 :
+        case 115 : deltaMoveX = 0; break;
+            
+        case 97 :
+        case 100 : deltaMoveS = 0; break;
 	}
 }
 
@@ -343,7 +374,7 @@ void releaseKey(int key, int x, int y) {
 void mouseMove(int x, int y) {
     
     if (yOrigin >= 0) {
-        
+        //get looking up and down
         
     }
     
@@ -358,6 +389,11 @@ void mouseMove(int x, int y) {
 		lz = -cos(angleX + deltaAngleX);
         
         
+        
+        lsx = sin(angleX + deltaAngleX + 1.5707); //90 degrees in radians is 1.5707
+        lsz = -cos(angleX + deltaAngleX + 1.5707);
+        
+        
 		glutSetWindow(mainWindow);
 		glutPostRedisplay();
 	}
@@ -369,7 +405,8 @@ void mouseButton(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON) {
         
 		// when the button is released
-		if (state == GLUT_UP) {
+		if (state == GLUT_UP)
+        {
 			angleX += deltaAngleX;
 			deltaAngleX = 0.0f;
 			xOrigin = -1;
