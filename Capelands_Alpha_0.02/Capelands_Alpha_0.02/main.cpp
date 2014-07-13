@@ -30,7 +30,7 @@ float angleY = 0.0f; //for up-down
 float lx=0.0f,lz=-1.0f, ly = 0.0f, ly2 = 0.0f, lsx = 0.0f, lsz = 0.0f;
 
 // XZ position of the camera
-float x=0.0f, z=5.0f, y = 1.75f;
+float x=0.0f, z=5.0f, y = 2.75f;
 
 // the key states. These variables will be zero
 //when no key is being presses
@@ -264,18 +264,13 @@ void renderSceneAll() {
 	// check for keyboard movement
 	//if (deltaMoveX || deltaMoveS) {
     cout << "Y: " << y << "\n";
-    if(abs(y) > 1)
+    if(y + deltaMoveY > 1)
     {
-        if(y > 1)
-        {
-            deltaMoveY = deltaMoveY - 0.05;
-        }
-        
-        else if (y < 1)
-        {
-            deltaMoveY += 0.05;
-        }
-        
+        deltaMoveY -= 0.05;
+    }
+    else
+    {
+        deltaMoveY = 0;
     }
     computePos(deltaMoveX,deltaMoveS,deltaMoveY);
     glutSetWindow(mainWindow);
