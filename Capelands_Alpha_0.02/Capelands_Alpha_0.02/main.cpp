@@ -40,6 +40,11 @@ float deltaMoveX = 0; //forward/backwards
 float deltaMoveS = 0; //strafe side to side
 float deltaMoveY = 0; // up and down
 
+float leftval = 0.0f;
+float rightval = 0.0f;
+float forwardval = 0.0f;
+float backval = 0.0f;
+
 float mouseSensitivity = 0.005f; //what camera movements are multiplied by. Default = 0.001f
 
 int xOrigin = -1;
@@ -222,7 +227,7 @@ void renderScene() {
 void renderScenesw1() {
     
 	glutSetWindow(subWindow1);
-     //glutSetCursor(GLUT_CURSOR_NONE);
+     //glutSetCursor(GLUT_CURSOR_NONE); // ENABLE THIS TO HIDE MOUSE
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 	glLoadIdentity();
@@ -263,15 +268,20 @@ void renderSceneAll() {
     
 	// check for keyboard movement
 	//if (deltaMoveX || deltaMoveS) {
-    cout << "Y: " << y << "\n";
+    //cout << "Y: " << y << "\n";
     if(y + deltaMoveY > 1)
     {
         deltaMoveY -= 0.05;
     }
+    
     else
     {
         deltaMoveY = 0;
     }
+    
+    deltaMoveX = forwardval + backval;
+    deltaMoveS = rightval + leftval;
+    
     computePos(deltaMoveX,deltaMoveS,deltaMoveY);
     glutSetWindow(mainWindow);
      //glutSetCursor(GLUT_CURSOR_NONE);
@@ -295,10 +305,10 @@ void processNormalKeys(unsigned char key, int xx, int yy) {
 
 
     switch (key) {
-        case 119: deltaMoveX = 0.5f; break;
-        case 115: deltaMoveX = -0.5f; break;
-        case 100: deltaMoveS = 0.5f; break;
-        case 97: deltaMoveS = -0.5; break;
+        case 119: forwardval = 0.5f; break; // w
+        case 115: backval = -0.5f; break; // s
+        case 100: rightval = 0.5f; break; // d
+        case 97: leftval = -0.5; break; // a
         case 32: deltaMoveY += 2; break; //space bar for jump
         case 27 : glutDestroyWindow(mainWindow); exit(0);
     }
@@ -313,10 +323,10 @@ void pressKey(int key, int xx, int yy) {
 	switch (key) {
 		case GLUT_KEY_UP : deltaMoveX = 0.5f; break;
 		case GLUT_KEY_DOWN : deltaMoveX = -0.5f; break;
-        case 119: deltaMoveX = 0.5f; break;
-        case 115: deltaMoveX = -0.5f; break;
-        case 100: deltaMoveS = 0.5f; break;
-        case 97: deltaMoveS = -0.5; break;
+        //case 119: deltaMoveX = 0.5f; break;
+        //case 115: deltaMoveX = -0.5f; break;
+        //case 100: deltaMoveS = 0.5f; break;
+        //case 97: deltaMoveS = -0.5; break;
 	}
     
 	glutSetWindow(mainWindow);
@@ -329,11 +339,11 @@ void releaseKey(int key, int x, int y) {
 	switch (key) {
 		case GLUT_KEY_UP :
 		case GLUT_KEY_DOWN :
-        case 119 :
-        case 115 : deltaMoveX = 0; break;
+        case 119 : forwardval = 0.0f; break;
+        case 115 : backval = 0.0f; break;
             
-        case 97 :
-        case 100 : deltaMoveS = 0; break;
+        case 97 : leftval =0.0f; break;
+        case 100 : rightval = 0.0f; break;
 	}
 }
 
